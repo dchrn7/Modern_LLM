@@ -1,0 +1,11 @@
+__pycache__
+*.pyc
+*.pyo
+.venv
+.gradio
+.git
+.gitignore
+.DS_Store
+.idea
+.vscode
+*.egg-info
