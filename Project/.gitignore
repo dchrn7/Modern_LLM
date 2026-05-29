@@ -1,0 +1,23 @@
+.DS_Store
+.idea
+.ipynb_checkpoints/
+.vscode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.bin
+*.pkl
+*.pt
+*.pyc
+input.txt
+env/
+.venv/
+.aai_env/
+.gradio/
+site/
+PP3: CLIP/data/cifar*
+!PP5: Pretraining GPT2/data/french_philosophy/*.bin
+nanoVLM
+PP7: VLM warmup/models/modality_projector_sol.py
+PP7: VLM warmup/models/vision_language_model_sol.py
