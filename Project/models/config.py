@@ -199,11 +199,11 @@ class TrainConfig:
     # Run the validation loop every eval_interval optimizer steps;
     # computes average val loss and saves checkpoint if improved
     #eval_interval: int = 500
-    eval_interval: int = 1000
+    eval_interval: int = 50
 
     # Print training loss to stdout every log_interval optimizer steps
     #log_interval: int = 50
-    log_interval: int = 250
+    log_interval: int = 25
 
     # Fraction of max_steps used for linear LR warmup (0 → max_lr);
     # after warmup, LR decays via cosine schedule to max_lr/10
@@ -250,7 +250,12 @@ class TrainConfig:
     mmstar_eval_limit: int = 128
     mmstar_output_dir: str = 'eval_results'
 
-    checkpoint_dir: str = '/work/formation/tpirtmntll/checkpoints'
+    user = os.environ.get("USER", "tpirtmntll")
+    checkpoint_dir: str = f'/work/formation/{user}/checkpoints'
+    train_cache_dir: str = f"/tmpdir/{user}/cache" # cache for operations on the train set
+    test_cache_dir  = f"/tmpdir/{user}/cache" # cache for operations on the test set
+    shuffled_dataset_dir = f"/tmpdir/{user}/cache" # cache to save the shuffled version of the train set
+    shuffle_seed = 42
 
     # Whether to apply torch.compile() to the model for potential speedup
     compile: bool = False

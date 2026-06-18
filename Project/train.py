@@ -108,60 +108,133 @@ def get_dataloaders(train_cfg: TrainConfig, vlm_cfg: VLMConfig, samples_consumed
             ds, tokenizer, image_processor, vlm_cfg
         )
     else:
-        import hashlib        
+        
+        import hashlib 
+        # =================== 
+        # Vibe coded: load the dataset:
+        # If a splitted and shuffled version exists, load it.
+        # Else create save and load it.       
 
         # Load and concatenate all cauldron subsets
-        train_splits = []
-        val_splits = []
-        base_path = train_cfg.dataset_local_path
-        for subset in train_cfg.dataset_subsets:
-            subset_path = os.path.join(base_path, subset)
-            if not os.path.exists(subset_path):
-                print(f"  [skip] {subset} not found at {subset_path}")
-                continue
-            print(f"  Loading {subset}...")
-            raw = load_from_disk(subset_path)
-            ds = raw["train"] if "train" in raw else raw
+        cache_root = train_cfg.shuffled_dataset_dir
+        train_cache_path = os.path.join(cache_root, "train_shuffled")
+        val_cache_path = os.path.join(cache_root, "val")
 
-            subset_hash = hashlib.md5(subset.encode()).hexdigest()[:8]
-            train_cache = f"/tmpdir/tpirtmntll/hf_cache/{subset_hash}_train.arrow"
-            test_cache  = f"/tmpdir/tpirtmntll/hf_cache/{subset_hash}_test.arrow"
+        # ------------------------------------------------------------------
+        # Load precomputed datasets if they exist
+        # ------------------------------------------------------------------
+        if (
+            os.path.isdir(train_cache_path)
+            and os.path.isdir(val_cache_path)
+        ):
+            print(f"Loading cached train dataset from {train_cache_path}")
+            train_ds = load_from_disk(train_cache_path)
 
-            n_val = int(len(ds) * train_cfg.val_proportion)
-            indices = list(range(len(ds)))
-            train_splits.append(ds.select(indices[n_val:],  indices_cache_file_name=train_cache))
-            val_splits.append(  ds.select(indices[:n_val],  indices_cache_file_name=test_cache))
+            print(f"Loading cached val dataset from {val_cache_path}")
+            val_ds = load_from_disk(val_cache_path)
 
-        if not train_splits:
-            raise ValueError(
-                f"No cauldron subsets found under {base_path}/. "
-                "Run prepare_datasets.py first."
+        else:
+            print("Cached datasets not found. Building train/val split...")
+
+            train_splits = []
+            val_splits = []
+
+            base_path = train_cfg.dataset_local_path
+
+            for subset in train_cfg.dataset_subsets:
+                subset_path = os.path.join(base_path, subset)
+
+                if not os.path.exists(subset_path):
+                    print(f"  [skip] {subset} not found at {subset_path}")
+                    continue
+
+                print(f"  Loading {subset}...")
+                raw = load_from_disk(subset_path)
+                ds = raw["train"] if "train" in raw else raw
+
+                subset_hash = hashlib.md5(subset.encode()).hexdigest()[:8]
+                
+                train_arrow_cache = (
+                    os.path.join(train_cfg.train_cache_dir, f"{subset_hash}_train.arrow")
+                )
+                test_arrow_cache = (
+                    os.path.join(train_cfg.test_cache_dir, f"{subset_hash}_train.arrow")
+                )
+                os.makedirs(os.path.dirname(train_arrow_cache), exist_ok=True)
+                os.makedirs(os.path.dirname(test_arrow_cache), exist_ok=True)
+
+                n_val = int(len(ds) * train_cfg.val_proportion)
+
+                # shuffle the subset
+                import random 
+                indices = list(range(len(ds)))
+                indices = list(range(len(ds)))
+                rng = random.Random(train_cfg.shuffle_seed)
+                rng.shuffle(indices)
+
+                train_splits.append(
+                    ds.select(
+                        indices[n_val:],
+                        indices_cache_file_name=train_arrow_cache,
+                    )
+                )
+
+                val_splits.append(
+                    ds.select(
+                        indices[:n_val],
+                        indices_cache_file_name=test_arrow_cache,
+                    )
+                )
+
+            if not train_splits:
+                raise ValueError(
+                    f"No cauldron subsets found under {base_path}/. "
+                    "Run prepare_datasets.py first."
+                )
+
+            train_ds = concatenate_datasets(train_splits)
+            val_ds = concatenate_datasets(val_splits)
+
+            print(
+                f"Loaded {len(train_splits)} subsets → "
+                f"{len(train_ds)} train / {len(val_ds)} val samples"
             )
 
-        train_ds = concatenate_datasets(train_splits)
-        val_ds = concatenate_datasets(val_splits)
-        print(f"Loaded {len(train_splits)} subsets → {len(train_ds)} train / {len(val_ds)} val samples")
+            # --------------------------------------------------------------
+            # Shuffle train set once and save both datasets
+            # --------------------------------------------------------------
+            print(
+                f"Shuffling train dataset with seed "
+                f"{train_cfg.shuffle_seed}"
+            )
+            train_ds = train_ds.shuffle(seed=train_cfg.shuffle_seed, indices_cache_file_name=train_arrow_cache)
+
+            os.makedirs(cache_root, exist_ok=True)
+
+            print(f"Saving shuffled train dataset to {train_cache_path}")
+            train_ds.save_to_disk(train_cache_path)
+
+            print(f"Saving val dataset to {val_cache_path}")
+            val_ds.save_to_disk(val_cache_path)
 
         from data.dataset import CauldronDataset
         train_dataset = CauldronDataset(
-            train_ds, tokenizer, image_processor, vlm_cfg
+            train_ds, tokenizer, image_processor, vlm_cfg, samples_consumed, train_arrow_cache
         )
         val_dataset = CauldronDataset(
-            val_ds, tokenizer, image_processor, vlm_cfg
+            val_ds, tokenizer, image_processor, vlm_cfg, None, None
         )
 
     collator = VQACollator(tokenizer, max_length=train_cfg.max_length)
 
     # Sampler : shuffle and start again at the correct sample
     shuffle_seed = 42 # Do not change (jobs have to use the same permutation)
-    sampler = ResumableRandomSampler(train_dataset, seed=shuffle_seed, start_index=samples_consumed)
     train_loader = DataLoader(
         train_dataset,
         batch_size=train_cfg.batch_size,
         collate_fn=collator,
         num_workers=1,
         pin_memory=True,
-        sampler=sampler
     )
     val_loader = DataLoader(
         val_dataset,
