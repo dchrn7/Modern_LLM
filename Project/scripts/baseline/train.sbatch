@@ -1,12 +1,11 @@
 #!/bin/bash
-#SBATCH -J first_training
+#SBATCH -J baseline_training
 #SBATCH --nodes 1
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task=8
 #SBATCH --gres=gpu:1
 #SBATCH -p shared
 #SBATCH --time=8:00:00 
-#SBATCH --reservation=tpirt14
 #SBATCH --output=/users/formation/tpirtmntll/out/job_%j.out
 #SBATCH --error=/users/formation/tpirtmntll/err/job_%j.err
 
@@ -22,4 +21,9 @@ apptainer exec \
 --bind /tmpdir,/work \
 --nv /work/conteneurs/sessions-interactives/pytorch-24.02-py3-calmip-si.sif \
 uv run python /users/formation/tpirtmntll/Modern_LLM/Project/train.py --dataset_type cauldron \
-    --max_steps 11000
+    --max_steps 11000 \
+    --checkpoint_dir '/work/formation/tpirtmntll/checkpoints' \
+    --modality_projector_type "baseline" \
+    --batch_size 8 \
+    --gradient_accumulation_steps 16 \
+

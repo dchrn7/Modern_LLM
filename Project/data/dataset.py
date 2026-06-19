@@ -51,13 +51,15 @@ class CauldronDataset(IterableDataset):
                     range(sample_consumed, len(dataset)),
                     indices_cache_file_name=cache_file,
                 )
-        print(len(dataset))
         self.tokenizer = tokenizer
         self.image_processor = image_processor
         self.cfg = cfg
         self.image_string = get_image_string(
             cfg.projector.image_token_length, cfg.image_token
         )
+    
+    def __len__(self):
+        return len(self.dataset)
 
     def _build_messages(self, item):
         """Convert a Cauldron row into a chat transcript."""

@@ -146,15 +146,23 @@ class VLMConfig:
     image_token: str = '<|image|>'
 
     # Whether to download and load pretrained SigLIP2 + SmolLM2 weights
-    # when constructing VisionLanguageModel (False for unit tests)
+    # when constructing VisionLanguageModel (False for unitbe tests)
     load_backbone_weights: bool = True
 
     # Directory where VisionLanguageModel.save_pretrained() writes the
     # safetensors checkpoint and config JSON during training
     checkpoint_path: str = 'checkpoints'
 
+    # Number of ResBlock before the average pooling in the Modality Projector (slow)
+    n_pre : int = 1
+    # Number of ResBlock after the average pooling in the Modality Projector
+    n_post : int = 2
+    # We put the modality projector in train config to override it easily in the sbatch run options
+    # We give it to the from dict function to add it in the vlm config
+    # When not using from dict, we put it as a field of vlm config in training.
+
     @classmethod
-    def from_dict(cls, d: dict) -> 'VLMConfig':
+    def from_dict(cls, d: dict, modality_projector_type="baseline") -> 'VLMConfig':
         """Reconstruct from a plain dict (e.g. loaded from JSON via asdict)."""
         return cls(
             vit=ViTConfig(**d.get('vit', {})),
@@ -163,6 +171,7 @@ class VLMConfig:
             image_token=d.get('image_token', '<|image|>'),
             load_backbone_weights=d.get('load_backbone_weights', True),
             checkpoint_path=d.get('checkpoint_path', 'checkpoints'),
+            modality_projector_type=modality_projector_type
         )
 
 
@@ -182,11 +191,11 @@ class TrainConfig:
     lr_lm: float = 5e-5
 
     # Number of samples per forward pass (micro-batch); limited by GPU memory
-    batch_size: int = 16
+    batch_size: int = 8
 
     # Number of micro-batches accumulated before one optimizer.step();
     # effective batch size = batch_size × gradient_accumulation_steps = 16
-    gradient_accumulation_steps: int = 8
+    gradient_accumulation_steps: int = 16
 
     # Maximum L2 norm for gradient clipping (torch.nn.utils.clip_grad_norm_);
     # applied to all parameters before each optimizer step
@@ -199,11 +208,11 @@ class TrainConfig:
     # Run the validation loop every eval_interval optimizer steps;
     # computes average val loss and saves checkpoint if improved
     #eval_interval: int = 500
-    eval_interval: int = 50
+    eval_interval: int = 25
 
     # Print training loss to stdout every log_interval optimizer steps
     #log_interval: int = 50
-    log_interval: int = 25
+    log_interval: int = 5
 
     # Fraction of max_steps used for linear LR warmup (0 → max_lr);
     # after warmup, LR decays via cosine schedule to max_lr/10
@@ -253,8 +262,9 @@ class TrainConfig:
     user = os.environ.get("USER", "tpirtmntll")
     checkpoint_dir: str = f'/work/formation/{user}/checkpoints'
     cache_dir: str = f"/tmpdir/{user}/cache" # cache for operations on dataset
-    dataset_save_dir = f"/tmpdir/{user}/dataset" # cache to save the shuffled version of the train set
-    shuffle_seed = 42
+    dataset_save_dir: str = f"/tmpdir/{user}/dataset" # cache to save the shuffled version of the train set
+    shuffle_seed: int = 42
+    modality_projector_type: str = "baseline"
 
     # Whether to apply torch.compile() to the model for potential speedup
     compile: bool = False

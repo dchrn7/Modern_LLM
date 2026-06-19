@@ -34,6 +34,7 @@ from models.config import VLMConfig, TrainConfig
 from models.vision_language_model import VisionLanguageModel
 from data.processors import get_tokenizer, get_image_processor
 from data.collator import VQACollator
+from math import ceil
 
 
 # ── Cosine LR schedule with linear warmup ────────────────────────────────────
@@ -228,17 +229,24 @@ def get_dataloaders(train_cfg: TrainConfig, vlm_cfg: VLMConfig, samples_consumed
 
         from data.dataset import CauldronDataset
 
-        resume_cache = os.path.join(cache_dir, f"resume_skip_{samples_consumed}.arrow")
+        if samples_consumed != 0:
+            resume_cache = os.path.join(cache_dir, f"resume_skip_{samples_consumed}.arrow")
+        else:
+            resume_cache = None
+
         train_dataset = CauldronDataset(
             train_ds, tokenizer, image_processor, vlm_cfg, samples_consumed, resume_cache
         )
-        os.remove(resume_cache)
-        print(f"train datasets created : {len(train_dataset)} train samples")
+
+        if samples_consumed != 0:
+            os.remove(resume_cache)
+
+        print(f"train datasets created : {len(train_dataset.dataset)} train samples")
 
         val_dataset = CauldronDataset(
             val_ds, tokenizer, image_processor, vlm_cfg, None, None
         )
-        print(f"val datasets created : {len(val_dataset)} val samples")
+        print(f"val datasets created : {len(val_dataset.dataset)} val samples")
 
     collator = VQACollator(tokenizer, max_length=train_cfg.max_length)
 
@@ -321,8 +329,9 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
 
     if resume_dir:
         print(f"Resuming from {resume_dir} (step {resume_state['global_step']})")
-        model = VisionLanguageModel.from_pretrained(resume_dir)
+        model = VisionLanguageModel.from_pretrained(resume_dir, train_cfg.modality_projector_type)
     else:
+        vlm_cfg.modality_projector_type = train_cfg.modality_projector_type
         print("No checkpoint found — starting from scratch.")
         model = VisionLanguageModel(vlm_cfg, load_backbone=vlm_cfg.load_backbone_weights)
     model.to(device)
@@ -399,10 +408,12 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
     # ═══════════════════════════════════════════════════════════════════════════
     # MAIN TRAINING LOOP
     # ═══════════════════════════════════════════════════════════════════════════
-    current_iteration = samples_consumed/(train_cfg.batch_size * train_cfg.gradient_accumulation_steps)
-    one_epoch = len(train_loader) / train_cfg.gradient_accumulation_steps
+    current_iteration = int(ceil(samples_consumed 
+                                       /(train_cfg.batch_size * train_cfg.gradient_accumulation_steps)))
+    one_epoch = int(ceil(len(train_loader) / train_cfg.gradient_accumulation_steps))
     print(f"Starting training : {current_iteration} / {one_epoch}")
     accum_step = 0   # counts micro-steps within one accumulation cycle
+    epoch_done = False
 
     while global_step < train_cfg.max_steps:
         model.train()
