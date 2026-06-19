@@ -47,10 +47,11 @@ class CauldronDataset(IterableDataset):
         self.dataset = dataset
         if sample_consumed is not None:
             print(f"skipping the data seen in previous trainings : {sample_consumed} samples")
-            dataset = dataset.select(
+            self.dataset = dataset.select(
                     range(sample_consumed, len(dataset)),
                     indices_cache_file_name=cache_file,
                 )
+        print(len(dataset))
         self.tokenizer = tokenizer
         self.image_processor = image_processor
         self.cfg = cfg

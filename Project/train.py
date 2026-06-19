@@ -116,24 +116,30 @@ def get_dataloaders(train_cfg: TrainConfig, vlm_cfg: VLMConfig, samples_consumed
         # Else create save and load it.       
 
         # Load and concatenate all cauldron subsets
-        cache_root = train_cfg.shuffled_dataset_dir
-        train_cache_path = os.path.join(cache_root, "train_shuffled")
-        val_cache_path = os.path.join(cache_root, "val")
+        dataset_save_dir = train_cfg.dataset_save_dir
+        train_save_dir = os.path.join(dataset_save_dir, "train_shuffled")
+        val_save_dir = os.path.join(dataset_save_dir, "val")
+        cache_dir = train_cfg.cache_dir
+
+        os.makedirs(cache_dir, exist_ok=True)
 
         # ------------------------------------------------------------------
         # Load precomputed datasets if they exist
         # ------------------------------------------------------------------
         if (
-            os.path.isdir(train_cache_path)
-            and os.path.isdir(val_cache_path)
+            os.path.isdir(train_save_dir)
+            and os.path.isdir(val_save_dir)
         ):
-            print(f"Loading cached train dataset from {train_cache_path}")
-            train_ds = load_from_disk(train_cache_path)
+            print(f"Loading cached train dataset from {train_save_dir}")
+            train_ds = load_from_disk(train_save_dir)
 
-            print(f"Loading cached val dataset from {val_cache_path}")
-            val_ds = load_from_disk(val_cache_path)
+            print(f"Loading cached val dataset from {val_save_dir}")
+            val_ds = load_from_disk(val_save_dir)
 
         else:
+
+            os.makedirs(train_save_dir, exist_ok=True)
+            os.makedirs(val_save_dir, exist_ok=True)
             print("Cached datasets not found. Building train/val split...")
 
             train_splits = []
@@ -155,13 +161,11 @@ def get_dataloaders(train_cfg: TrainConfig, vlm_cfg: VLMConfig, samples_consumed
                 subset_hash = hashlib.md5(subset.encode()).hexdigest()[:8]
                 
                 train_arrow_cache = (
-                    os.path.join(train_cfg.train_cache_dir, f"{subset_hash}_train.arrow")
+                    os.path.join(cache_dir, f"{subset_hash}_train.arrow")
                 )
                 test_arrow_cache = (
-                    os.path.join(train_cfg.test_cache_dir, f"{subset_hash}_train.arrow")
+                    os.path.join(cache_dir, f"{subset_hash}_test.arrow")
                 )
-                os.makedirs(os.path.dirname(train_arrow_cache), exist_ok=True)
-                os.makedirs(os.path.dirname(test_arrow_cache), exist_ok=True)
 
                 n_val = int(len(ds) * train_cfg.val_proportion)
 
@@ -186,6 +190,9 @@ def get_dataloaders(train_cfg: TrainConfig, vlm_cfg: VLMConfig, samples_consumed
                     )
                 )
 
+                os.remove(train_arrow_cache)
+                os.remove(test_arrow_cache)
+
             if not train_splits:
                 raise ValueError(
                     f"No cauldron subsets found under {base_path}/. "
@@ -207,28 +214,35 @@ def get_dataloaders(train_cfg: TrainConfig, vlm_cfg: VLMConfig, samples_consumed
                 f"Shuffling train dataset with seed "
                 f"{train_cfg.shuffle_seed}"
             )
-            train_ds = train_ds.shuffle(seed=train_cfg.shuffle_seed, indices_cache_file_name=train_arrow_cache)
+            train_shuffle_cache = (
+                    os.path.join(cache_dir, f"shuffle_train_cache.arrow")
+                )
+            train_ds = train_ds.shuffle(seed=train_cfg.shuffle_seed, indices_cache_file_name=train_shuffle_cache)
+            os.remove(train_shuffle_cache)
 
-            os.makedirs(cache_root, exist_ok=True)
+            print(f"Saving shuffled train dataset to {train_save_dir}")
+            train_ds.save_to_disk(train_save_dir)
 
-            print(f"Saving shuffled train dataset to {train_cache_path}")
-            train_ds.save_to_disk(train_cache_path)
-
-            print(f"Saving val dataset to {val_cache_path}")
-            val_ds.save_to_disk(val_cache_path)
+            print(f"Saving val dataset to {val_save_dir}")
+            val_ds.save_to_disk(val_save_dir)
 
         from data.dataset import CauldronDataset
+
+        resume_cache = os.path.join(cache_dir, f"resume_skip_{samples_consumed}.arrow")
         train_dataset = CauldronDataset(
-            train_ds, tokenizer, image_processor, vlm_cfg, samples_consumed, train_arrow_cache
+            train_ds, tokenizer, image_processor, vlm_cfg, samples_consumed, resume_cache
         )
+        os.remove(resume_cache)
+        print(f"train datasets created : {len(train_dataset)} train samples")
+
         val_dataset = CauldronDataset(
             val_ds, tokenizer, image_processor, vlm_cfg, None, None
         )
+        print(f"val datasets created : {len(val_dataset)} val samples")
 
     collator = VQACollator(tokenizer, max_length=train_cfg.max_length)
 
     # Sampler : shuffle and start again at the correct sample
-    shuffle_seed = 42 # Do not change (jobs have to use the same permutation)
     train_loader = DataLoader(
         train_dataset,
         batch_size=train_cfg.batch_size,
@@ -385,7 +399,11 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
     # ═══════════════════════════════════════════════════════════════════════════
     # MAIN TRAINING LOOP
     # ═══════════════════════════════════════════════════════════════════════════
+    current_iteration = samples_consumed/(train_cfg.batch_size * train_cfg.gradient_accumulation_steps)
+    one_epoch = len(train_loader) / train_cfg.gradient_accumulation_steps
+    print(f"Starting training : {current_iteration} / {one_epoch}")
     accum_step = 0   # counts micro-steps within one accumulation cycle
+
     while global_step < train_cfg.max_steps:
         model.train()
 
@@ -397,9 +415,12 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
             except StopIteration:
                 #iter_train = iter(train_loader)
                 #batch = next(iter_train)
-                # For practical reason, we will only do 1 epoch (no time remaining + simpler to handle dataloader logic)
+                # For practical reason, we will only do 1 epoch (no time remaining + simpler to handle dataloader logic)epoch_done = True
+                epoch_done = True
                 print(f"Epoch complete after {samples_consumed} samples — stopping.")
                 break
+        if epoch_done:
+            break
 
         is_update_step = (
             (accum_step + 1) % train_cfg.gradient_accumulation_steps == 0

@@ -252,9 +252,8 @@ class TrainConfig:
 
     user = os.environ.get("USER", "tpirtmntll")
     checkpoint_dir: str = f'/work/formation/{user}/checkpoints'
-    train_cache_dir: str = f"/tmpdir/{user}/cache" # cache for operations on the train set
-    test_cache_dir  = f"/tmpdir/{user}/cache" # cache for operations on the test set
-    shuffled_dataset_dir = f"/tmpdir/{user}/cache" # cache to save the shuffled version of the train set
+    cache_dir: str = f"/tmpdir/{user}/cache" # cache for operations on dataset
+    dataset_save_dir = f"/tmpdir/{user}/dataset" # cache to save the shuffled version of the train set
     shuffle_seed = 42
 
     # Whether to apply torch.compile() to the model for potential speedup
