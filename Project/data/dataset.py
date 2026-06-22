@@ -41,14 +41,25 @@ class CauldronDataset(IterableDataset):
     Returns None for rows that cannot be converted (caller / collator skips them).
     """
 
-    def __init__(self, dataset, tokenizer, image_processor, cfg):
+    def __init__(self, dataset, tokenizer, image_processor, cfg, sample_consumed, cache_file):
+
+
         self.dataset = dataset
+        if sample_consumed is not None:
+            print(f"skipping the data seen in previous trainings : {sample_consumed} samples")
+            self.dataset = dataset.select(
+                    range(sample_consumed, len(dataset)),
+                    indices_cache_file_name=cache_file,
+                )
         self.tokenizer = tokenizer
         self.image_processor = image_processor
         self.cfg = cfg
         self.image_string = get_image_string(
             cfg.projector.image_token_length, cfg.image_token
         )
+    
+    def __len__(self):
+        return len(self.dataset)
 
     def _build_messages(self, item):
         """Convert a Cauldron row into a chat transcript."""

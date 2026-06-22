@@ -34,6 +34,7 @@ from models.config import VLMConfig, TrainConfig
 from models.vision_language_model import VisionLanguageModel
 from data.processors import get_tokenizer, get_image_processor
 from data.collator import VQACollator
+from math import ceil
 
 user = os.environ.get("USER")
 
@@ -88,60 +89,155 @@ def get_dataloaders(train_cfg: TrainConfig, vlm_cfg: VLMConfig, samples_consumed
             ds, tokenizer, image_processor, vlm_cfg
         )
     else:
-        import hashlib        
+        
+        import hashlib 
+        # =================== 
+        # Vibe coded: load the dataset:
+        # If a splitted and shuffled version exists, load it.
+        # Else create save and load it.       
 
         # Load and concatenate all cauldron subsets
-        train_splits = []
-        val_splits = []
-        base_path = train_cfg.dataset_local_path
-        for subset in train_cfg.dataset_subsets:
-            subset_path = os.path.join(base_path, subset)
-            if not os.path.exists(subset_path):
-                print(f"  [skip] {subset} not found at {subset_path}")
-                continue
-            print(f"  Loading {subset}...")
-            raw = load_from_disk(subset_path)
-            ds = raw["train"] if "train" in raw else raw
+        dataset_save_dir = train_cfg.dataset_save_dir
+        train_save_dir = os.path.join(dataset_save_dir, "train_shuffled")
+        val_save_dir = os.path.join(dataset_save_dir, "val")
+        cache_dir = train_cfg.cache_dir
 
-            subset_hash = hashlib.md5(subset.encode()).hexdigest()[:8]
-            train_cache = f"/tmpdir/user/hf_cache/{subset_hash}_train.arrow"
-            test_cache  = f"/tmpdir/user/hf_cache/{subset_hash}_test.arrow"
+        os.makedirs(cache_dir, exist_ok=True)
 
-            n_val = int(len(ds) * train_cfg.val_proportion)
-            indices = list(range(len(ds)))
-            train_splits.append(ds.select(indices[n_val:],  indices_cache_file_name=train_cache))
-            val_splits.append(  ds.select(indices[:n_val],  indices_cache_file_name=test_cache))
+        # ------------------------------------------------------------------
+        # Load precomputed datasets if they exist
+        # ------------------------------------------------------------------
+        if (
+            os.path.isdir(train_save_dir)
+            and os.path.isdir(val_save_dir)
+        ):
+            print(f"Loading cached train dataset from {train_save_dir}")
+            train_ds = load_from_disk(train_save_dir)
 
-        if not train_splits:
-            raise ValueError(
-                f"No cauldron subsets found under {base_path}/. "
-                "Run prepare_datasets.py first."
+            print(f"Loading cached val dataset from {val_save_dir}")
+            val_ds = load_from_disk(val_save_dir)
+
+        else:
+
+            os.makedirs(train_save_dir, exist_ok=True)
+            os.makedirs(val_save_dir, exist_ok=True)
+            print("Cached datasets not found. Building train/val split...")
+
+            train_splits = []
+            val_splits = []
+
+            base_path = train_cfg.dataset_local_path
+
+            for subset in train_cfg.dataset_subsets:
+                subset_path = os.path.join(base_path, subset)
+
+                if not os.path.exists(subset_path):
+                    print(f"  [skip] {subset} not found at {subset_path}")
+                    continue
+
+                print(f"  Loading {subset}...")
+                raw = load_from_disk(subset_path)
+                ds = raw["train"] if "train" in raw else raw
+
+                subset_hash = hashlib.md5(subset.encode()).hexdigest()[:8]
+                
+                train_arrow_cache = (
+                    os.path.join(cache_dir, f"{subset_hash}_train.arrow")
+                )
+                test_arrow_cache = (
+                    os.path.join(cache_dir, f"{subset_hash}_test.arrow")
+                )
+
+                n_val = int(len(ds) * train_cfg.val_proportion)
+
+                # shuffle the subset
+                import random 
+                indices = list(range(len(ds)))
+                indices = list(range(len(ds)))
+                rng = random.Random(train_cfg.shuffle_seed)
+                rng.shuffle(indices)
+
+                train_splits.append(
+                    ds.select(
+                        indices[n_val:],
+                        indices_cache_file_name=train_arrow_cache,
+                    )
+                )
+
+                val_splits.append(
+                    ds.select(
+                        indices[:n_val],
+                        indices_cache_file_name=test_arrow_cache,
+                    )
+                )
+
+                os.remove(train_arrow_cache)
+                os.remove(test_arrow_cache)
+
+            if not train_splits:
+                raise ValueError(
+                    f"No cauldron subsets found under {base_path}/. "
+                    "Run prepare_datasets.py first."
+                )
+
+            train_ds = concatenate_datasets(train_splits)
+            val_ds = concatenate_datasets(val_splits)
+
+            print(
+                f"Loaded {len(train_splits)} subsets → "
+                f"{len(train_ds)} train / {len(val_ds)} val samples"
             )
 
-        train_ds = concatenate_datasets(train_splits)
-        val_ds = concatenate_datasets(val_splits)
-        print(f"Loaded {len(train_splits)} subsets → {len(train_ds)} train / {len(val_ds)} val samples")
+            # --------------------------------------------------------------
+            # Shuffle train set once and save both datasets
+            # --------------------------------------------------------------
+            print(
+                f"Shuffling train dataset with seed "
+                f"{train_cfg.shuffle_seed}"
+            )
+            train_shuffle_cache = (
+                    os.path.join(cache_dir, f"shuffle_train_cache.arrow")
+                )
+            train_ds = train_ds.shuffle(seed=train_cfg.shuffle_seed, indices_cache_file_name=train_shuffle_cache)
+            os.remove(train_shuffle_cache)
+
+            print(f"Saving shuffled train dataset to {train_save_dir}")
+            train_ds.save_to_disk(train_save_dir)
+
+            print(f"Saving val dataset to {val_save_dir}")
+            val_ds.save_to_disk(val_save_dir)
 
         from data.dataset import CauldronDataset
+
+        if samples_consumed != 0:
+            resume_cache = os.path.join(cache_dir, f"resume_skip_{samples_consumed}.arrow")
+        else:
+            resume_cache = None
+
         train_dataset = CauldronDataset(
-            train_ds, tokenizer, image_processor, vlm_cfg
+            train_ds, tokenizer, image_processor, vlm_cfg, samples_consumed, resume_cache
         )
+
+        if os.path.isfile(resume_cache):
+            os.remove(resume_cache)
+
+        print(f"train datasets created : {len(train_dataset.dataset)} train samples")
+
         val_dataset = CauldronDataset(
-            val_ds, tokenizer, image_processor, vlm_cfg
+            val_ds, tokenizer, image_processor, vlm_cfg, None, None
         )
+        print(f"val datasets created : {len(val_dataset.dataset)} val samples")
 
     collator = VQACollator(tokenizer, max_length=train_cfg.max_length)
 
     # Sampler : shuffle and start again at the correct sample
-    shuffle_seed = 42 # Do not change (jobs have to use the same permutation)
-
     train_loader = DataLoader(
         train_dataset,
         batch_size=train_cfg.batch_size,
         collate_fn=collator,
         num_workers=1,
-        pin_memory=True    
-        )
+        pin_memory=True,
+    )
     val_loader = DataLoader(
         val_dataset,
         batch_size=train_cfg.batch_size,
@@ -213,8 +309,9 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
 
     if resume_dir:
         print(f"Resuming from {resume_dir} (step {resume_state['global_step']})")
-        model = VisionLanguageModel.from_pretrained(resume_dir)
+        model = VisionLanguageModel.from_pretrained(resume_dir, modality_projector_type=train_cfg.modality_projector_type)
     else:
+        vlm_cfg.modality_projector_type = train_cfg.modality_projector_type
         print("No checkpoint found — starting from scratch.")
         model = VisionLanguageModel(vlm_cfg, load_backbone=vlm_cfg.load_backbone_weights)
     model.to(device)
@@ -260,7 +357,7 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
     global_step = resume_state["global_step"] if resume_state else 0
     best_val_loss = resume_state["best_val_loss"] if resume_state else float("inf")
     best_mmstar_acc = resume_state["best_mmstar_acc"] if resume_state else -1.0
-    samples_consumed = resume_state["samples_consumed"] if resume_state else 0
+    samples_consumed = global_step * train_cfg.batch_size * train_cfg.gradient_accumulation_steps
     # ==================================================
 
     # ── Data ──────────────────────────────────────────────────────────────────
@@ -291,7 +388,13 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
     # ═══════════════════════════════════════════════════════════════════════════
     # MAIN TRAINING LOOP
     # ═══════════════════════════════════════════════════════════════════════════
+    current_iteration = int(ceil(samples_consumed 
+                                       /(train_cfg.batch_size * train_cfg.gradient_accumulation_steps)))
+    one_epoch = int(ceil(len(train_loader) / train_cfg.gradient_accumulation_steps))
+    print(f"Starting training : {current_iteration} / {one_epoch}")
     accum_step = 0   # counts micro-steps within one accumulation cycle
+    epoch_done = False
+
     while global_step < train_cfg.max_steps:
         model.train()
 
@@ -303,9 +406,12 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
             except StopIteration:
                 #iter_train = iter(train_loader)
                 #batch = next(iter_train)
-                # For practical reason, we will only do 1 epoch (no time remaining + simpler to handle dataloader logic)
+                # For practical reason, we will only do 1 epoch (no time remaining + simpler to handle dataloader logic)epoch_done = True
+                epoch_done = True
                 print(f"Epoch complete after {samples_consumed} samples — stopping.")
                 break
+        if epoch_done:
+            break
 
         is_update_step = (
             (accum_step + 1) % train_cfg.gradient_accumulation_steps == 0
@@ -323,7 +429,8 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
             batch['labels'],
         )
 
-        samples_consumed += input_ids.size(0) # keep track for restarting at the good sample
+        #samples_consumed += input_ids.size(0) # keep track for restarting at the good sample
+        # Made a mistake didn't save it, I will compute it from global step
 
         """print(input_ids.shape, labels.shape)
         for i, element in enumerate(input_ids[0]):

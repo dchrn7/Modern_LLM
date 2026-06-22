@@ -45,6 +45,7 @@ from models.config import VLMConfig
 from models.vision_transformer import ViT  # noqa: F401
 from models.language_model import LanguageModel  # noqa: F401
 from models.modality_projector import ModalityProjector  # noqa: F401
+from models.modality_projector_cnn import CAbstractor 
 from data.processors import get_tokenizer  # noqa: F401
 
 
@@ -82,7 +83,13 @@ class VisionLanguageModel(nn.Module):
         self.decoder = LanguageModel.from_pretrained(cfg.lm) if load_backbone else LanguageModel(cfg.lm)          # the causal language model
         #   if load_backbone: use LanguageModel.from_pretrained(cfg.lm)
         #   else:             use LanguageModel(cfg.lm)
-        self.MP = ModalityProjector(cfg)               # the ModalityProjector
+        print(f"Modality projector used: {cfg.modality_projector_type}")
+        if cfg.modality_projector_type == "baseline":
+            self.MP = ModalityProjector(cfg)               # the ModalityProjector
+        elif cfg.modality_projector_type == "cnn":
+            self.MP = CAbstractor(cfg)   
+        else:
+            raise ValueError("Unknown modality projector type")
         self.tokenizer = get_tokenizer(cfg.lm.tokenizer)        # the tokenizer (use get_tokenizer)
 
         # raise NotImplementedError
@@ -272,7 +279,7 @@ class VisionLanguageModel(nn.Module):
         print(f"Model saved to {save_directory}")
 
     @classmethod
-    def from_pretrained(cls, path: str, revision: Optional[str] = None):
+    def from_pretrained(cls, path: str, revision: Optional[str] = None, modality_projector_type="baseline"):
         """Load a trained VLM checkpoint from a local directory."""
         config_path = os.path.join(path, "config.json")
         weights_path = os.path.join(path, "model.safetensors")
@@ -280,6 +287,7 @@ class VisionLanguageModel(nn.Module):
             raise ValueError(f"Expected config.json and model.safetensors in {path}")
         with open(config_path) as f:
             cfg = VLMConfig.from_dict(json.load(f))
+        cfg.modality_projector_type = modality_projector_type
         model = cls(cfg, load_backbone=False)
         load_model(model, weights_path)
         return model

@@ -1,0 +1,135 @@
+Using device: cuda
+Resuming from /work/formation/tpirtmntll/checkpoints_cnn/last (step 725)
+Modality projector used: cnn
+Model: 492,797,568 parameters
+Loading cached train dataset from /tmpdir/tpirtmntll/dataset/train_shuffled
+Loading cached val dataset from /tmpdir/tpirtmntll/dataset/val
+skipping the data seen in previous trainings : 92800 samples
+train datasets created : 1292804 train samples
+val datasets created : 346379 val samples
+Training for 11000 optimiser steps (gradient_accumulation=16)
+Starting training : 725 / 10101
+step   730 | loss 9.9199e-01 | 171.8s
+step   735 | loss 1.4325e+00 | 321.5s
+step   740 | loss 3.8822e-01 | 587.3s
+step   745 | loss 1.0829e+00 | 735.4s
+step   750 | loss 8.4579e-01 | 1006.8s
+step   750 | val_loss 2.7910e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step   755 | loss 1.2028e+00 | 1194.7s
+step   760 | loss 1.2277e+00 | 1441.3s
+step   765 | loss 8.4242e-01 | 1699.4s
+step   770 | loss 9.5571e-01 | 1885.9s
+step   775 | loss 7.6825e-01 | 2086.7s
+step   780 | loss 6.6378e-01 | 2318.1s
+step   780 | val_loss 2.8322e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step   785 | loss 1.0517e+00 | 2575.9s
+step   790 | loss 1.2895e+00 | 2730.8s
+step   795 | loss 9.7013e-01 | 2953.0s
+step   800 | loss 1.8103e+00 | 3152.1s
+step   805 | loss 8.4036e-01 | 3333.8s
+step   810 | loss 1.2326e+00 | 3514.0s
+step   810 | val_loss 2.7872e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/best_tmp
+  → new best checkpoint saved to /work/formation/tpirtmntll/checkpoints_cnn/best
+step   815 | loss 8.4733e-01 | 3713.0s
+step   820 | loss 1.4500e+00 | 3857.3s
+step   825 | loss 5.0307e-01 | 4058.1s
+step   830 | loss 5.9841e-01 | 4285.6s
+step   835 | loss 9.1649e-01 | 4482.0s
+step   840 | loss 1.3908e+00 | 4716.1s
+step   840 | val_loss 2.8461e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step   845 | loss 9.1380e-01 | 4920.2s
+step   850 | loss 1.1704e+00 | 5122.4s
+step   855 | loss 1.8496e+00 | 5328.2s
+step   860 | loss 1.1042e+00 | 5556.4s
+step   865 | loss 1.2840e+00 | 5771.0s
+step   870 | loss 9.7822e-01 | 6095.3s
+step   870 | val_loss 2.7910e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step   875 | loss 1.7331e+00 | 6290.0s
+step   880 | loss 1.1438e+00 | 6488.4s
+step   885 | loss 5.4749e-01 | 6728.3s
+step   890 | loss 8.5439e-01 | 7010.5s
+step   895 | loss 8.0979e-01 | 7171.0s
+step   900 | loss 4.8367e-01 | 7320.9s
+step   900 | val_loss 2.7935e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step   905 | loss 8.5558e-01 | 7535.4s
+step   910 | loss 5.6591e-01 | 7782.5s
+step   915 | loss 9.5965e-01 | 7997.5s
+step   920 | loss 1.5309e+00 | 8160.1s
+step   925 | loss 1.9941e+00 | 8379.2s
+step   930 | loss 1.0979e+00 | 8560.3s
+step   930 | val_loss 2.8260e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step   935 | loss 1.1514e+00 | 8789.6s
+step   940 | loss 6.1639e-01 | 8941.1s
+step   945 | loss 9.8818e-01 | 9118.6s
+step   950 | loss 8.8827e-01 | 9358.8s
+step   955 | loss 7.1492e-01 | 9568.0s
+step   960 | loss 1.2749e+00 | 9808.1s
+step   960 | val_loss 2.7962e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step   965 | loss 4.7850e-01 | 10014.5s
+step   970 | loss 6.2887e-01 | 10154.5s
+step   975 | loss 1.4345e+00 | 10266.3s
+step   980 | loss 1.2012e+00 | 10431.4s
+step   985 | loss 1.3452e+00 | 10688.1s
+step   990 | loss 1.2229e+00 | 10865.2s
+step   990 | val_loss 2.8419e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step   995 | loss 1.0506e+00 | 11056.4s
+step  1000 | loss 7.9603e-01 | 11164.5s
+step  1005 | loss 3.1436e-01 | 11359.4s
+step  1010 | loss 1.2063e+00 | 11539.4s
+step  1015 | loss 1.0023e+00 | 11655.9s
+step  1020 | loss 1.1081e+00 | 11847.2s
+step  1020 | val_loss 2.8244e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step  1025 | loss 4.1277e-01 | 12107.5s
+step  1030 | loss 7.8336e-01 | 12335.9s
+step  1035 | loss 1.7215e+00 | 12530.6s
+step  1040 | loss 9.3133e-01 | 12695.4s
+step  1045 | loss 7.3937e-01 | 12844.6s
+step  1050 | loss 9.8932e-01 | 13025.6s
+step  1050 | val_loss 2.7931e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step  1055 | loss 9.9116e-01 | 13168.1s
+step  1060 | loss 1.2374e+00 | 13353.6s
+step  1065 | loss 9.7479e-01 | 13611.7s
+step  1070 | loss 6.9938e-01 | 13785.2s
+step  1075 | loss 1.6398e+00 | 13984.0s
+step  1080 | loss 7.1514e-01 | 14169.9s
+step  1080 | val_loss 2.7983e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step  1085 | loss 1.3060e+00 | 14325.9s
+step  1090 | loss 4.0313e-01 | 14540.0s
+step  1095 | loss 5.7616e-01 | 14705.6s
+step  1100 | loss 8.0304e-01 | 14862.8s
+step  1105 | loss 1.3237e+00 | 15073.1s
+step  1110 | loss 1.5464e+00 | 15294.8s
+step  1110 | val_loss 2.8022e-01
+Model saved to /work/formation/tpirtmntll/checkpoints_cnn/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints_cnn/last
+step  1115 | loss 9.3702e-01 | 15481.8s
+step  1120 | loss 1.1317e+00 | 15736.4s
+step  1125 | loss 8.9472e-01 | 15951.4s
+step  1130 | loss 1.4173e+00 | 16092.8s
+step  1135 | loss 9.0067e-01 | 16279.5s
+step  1140 | loss 1.4257e+00 | 16421.3s

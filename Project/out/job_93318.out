@@ -1,0 +1,246 @@
+Using device: cuda
+Resuming from /work/formation/tpirtmntll/checkpoints/last (step 725)
+Modality projector used: baseline
+Model: 460,051,584 parameters
+Loading cached train dataset from /tmpdir/tpirtmntll/dataset/train_shuffled
+Loading cached val dataset from /tmpdir/tpirtmntll/dataset/val
+skipping the data seen in previous trainings : 92800 samples
+train datasets created : 1292804 train samples
+val datasets created : 346379 val samples
+Training for 11000 optimiser steps (gradient_accumulation=16)
+Starting training : 725 / 10101
+step   730 | loss 9.9552e-01 | 167.7s
+step   735 | loss 1.4181e+00 | 314.8s
+step   740 | loss 3.8025e-01 | 575.8s
+step   745 | loss 1.0949e+00 | 721.2s
+step   750 | loss 8.5912e-01 | 988.1s
+step   750 | val_loss 2.8090e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   755 | loss 1.2001e+00 | 1161.1s
+step   760 | loss 1.2273e+00 | 1408.1s
+step   765 | loss 8.3203e-01 | 1665.0s
+step   770 | loss 9.0284e-01 | 1857.4s
+step   775 | loss 7.5984e-01 | 2064.0s
+step   775 | val_loss 2.8169e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   780 | loss 6.5017e-01 | 2313.7s
+step   785 | loss 1.0463e+00 | 2560.3s
+step   790 | loss 1.2920e+00 | 2720.4s
+step   795 | loss 9.6825e-01 | 2946.3s
+step   800 | loss 1.7887e+00 | 3145.2s
+step   800 | val_loss 2.8053e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   805 | loss 8.3333e-01 | 3333.4s
+step   810 | loss 1.2265e+00 | 3515.9s
+step   815 | loss 8.4649e-01 | 3721.8s
+step   820 | loss 1.4517e+00 | 3870.8s
+step   825 | loss 4.9983e-01 | 4073.1s
+step   825 | val_loss 2.8475e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   830 | loss 5.9599e-01 | 4321.7s
+step   835 | loss 9.0778e-01 | 4516.6s
+step   840 | loss 1.3786e+00 | 4750.5s
+step   845 | loss 9.1331e-01 | 4943.1s
+step   850 | loss 1.1666e+00 | 5144.9s
+step   850 | val_loss 2.8499e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   855 | loss 1.8491e+00 | 5361.8s
+step   860 | loss 1.1044e+00 | 5586.7s
+step   865 | loss 1.2884e+00 | 5806.6s
+step   870 | loss 9.7230e-01 | 6123.1s
+step   875 | loss 1.7127e+00 | 6310.8s
+step   875 | val_loss 2.8330e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   880 | loss 1.1190e+00 | 6518.6s
+step   885 | loss 5.3649e-01 | 6755.8s
+step   890 | loss 8.5416e-01 | 7031.2s
+step   895 | loss 8.0013e-01 | 7190.2s
+step   900 | loss 4.8367e-01 | 7346.4s
+step   900 | val_loss 2.8085e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   905 | loss 8.3614e-01 | 7558.1s
+step   910 | loss 5.7105e-01 | 7799.0s
+step   915 | loss 9.5930e-01 | 8012.4s
+step   920 | loss 1.5281e+00 | 8181.6s
+step   925 | loss 1.9726e+00 | 8399.7s
+step   925 | val_loss 2.8277e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   930 | loss 1.1018e+00 | 8602.0s
+step   935 | loss 1.1445e+00 | 8818.8s
+step   940 | loss 6.1331e-01 | 8975.0s
+step   945 | loss 9.8452e-01 | 9151.1s
+step   950 | loss 8.9634e-01 | 9390.4s
+step   950 | val_loss 2.8324e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   955 | loss 7.0619e-01 | 9632.1s
+step   960 | loss 1.2877e+00 | 9870.2s
+step   965 | loss 4.6700e-01 | 10064.5s
+step   970 | loss 6.2307e-01 | 10208.5s
+step   975 | loss 1.4346e+00 | 10327.6s
+step   975 | val_loss 2.8180e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step   980 | loss 1.1736e+00 | 10530.7s
+step   985 | loss 1.3559e+00 | 10784.9s
+step   990 | loss 1.2045e+00 | 10963.9s
+step   995 | loss 1.0409e+00 | 11145.8s
+step  1000 | loss 7.9807e-01 | 11257.9s
+step  1000 | val_loss 2.8820e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1005 | loss 3.1109e-01 | 11459.6s
+step  1010 | loss 1.2062e+00 | 11642.4s
+step  1015 | loss 1.0001e+00 | 11765.8s
+step  1020 | loss 1.1083e+00 | 11961.6s
+step  1025 | loss 4.1927e-01 | 12216.3s
+step  1025 | val_loss 2.8406e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1030 | loss 7.8320e-01 | 12462.1s
+step  1035 | loss 1.7223e+00 | 12660.7s
+step  1040 | loss 9.3110e-01 | 12835.0s
+step  1045 | loss 7.3732e-01 | 12987.4s
+step  1050 | loss 9.9005e-01 | 13172.2s
+step  1050 | val_loss 2.7952e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1055 | loss 9.8630e-01 | 13318.1s
+step  1060 | loss 1.2351e+00 | 13508.7s
+step  1065 | loss 9.8077e-01 | 13767.0s
+step  1070 | loss 7.1716e-01 | 13941.9s
+step  1075 | loss 1.6534e+00 | 14148.1s
+step  1075 | val_loss 2.8053e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1080 | loss 7.0963e-01 | 14343.0s
+step  1085 | loss 1.2872e+00 | 14488.9s
+step  1090 | loss 4.0477e-01 | 14705.6s
+step  1095 | loss 5.6953e-01 | 14870.9s
+step  1100 | loss 8.0292e-01 | 15032.0s
+step  1100 | val_loss 2.7942e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+Model saved to /work/formation/tpirtmntll/checkpoints/best_tmp
+  → new best checkpoint saved to /work/formation/tpirtmntll/checkpoints/best
+step  1105 | loss 1.2968e+00 | 15260.0s
+step  1110 | loss 1.5452e+00 | 15485.1s
+step  1115 | loss 9.3989e-01 | 15665.0s
+step  1120 | loss 1.1073e+00 | 15921.9s
+step  1125 | loss 8.9971e-01 | 16138.0s
+step  1125 | val_loss 2.8120e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1130 | loss 1.4124e+00 | 16303.7s
+step  1135 | loss 8.9824e-01 | 16497.9s
+step  1140 | loss 1.4225e+00 | 16645.0s
+step  1145 | loss 1.5548e+00 | 16781.2s
+step  1150 | loss 1.2101e+00 | 16900.2s
+step  1150 | val_loss 2.7961e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1155 | loss 1.3730e+00 | 17191.1s
+step  1160 | loss 1.3883e+00 | 17374.3s
+step  1165 | loss 5.8951e-01 | 17590.1s
+step  1170 | loss 8.2061e-01 | 17773.2s
+step  1175 | loss 4.5833e-01 | 17935.3s
+step  1175 | val_loss 2.8048e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1180 | loss 4.6382e-01 | 18114.7s
+step  1185 | loss 7.3800e-01 | 18286.5s
+step  1190 | loss 8.5317e-01 | 18511.9s
+step  1195 | loss 8.0345e-01 | 18691.9s
+step  1200 | loss 1.8262e+00 | 18912.5s
+step  1200 | val_loss 2.7871e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+Model saved to /work/formation/tpirtmntll/checkpoints/best_tmp
+  → new best checkpoint saved to /work/formation/tpirtmntll/checkpoints/best
+step  1205 | loss 8.8417e-01 | 19118.9s
+step  1210 | loss 7.4368e-01 | 19342.7s
+step  1215 | loss 6.3409e-01 | 19570.6s
+step  1220 | loss 1.1048e+00 | 19731.9s
+step  1225 | loss 1.2240e+00 | 19970.0s
+step  1225 | val_loss 2.8193e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1230 | loss 9.7130e-01 | 20180.3s
+step  1235 | loss 7.7094e-01 | 20388.0s
+step  1240 | loss 7.0148e-01 | 20569.1s
+step  1245 | loss 1.0250e+00 | 20819.7s
+step  1250 | loss 8.1495e-01 | 20959.0s
+step  1250 | val_loss 2.8514e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1255 | loss 2.2259e+00 | 21163.2s
+step  1260 | loss 4.2772e-01 | 21336.5s
+step  1265 | loss 8.0367e-01 | 21528.9s
+step  1270 | loss 9.7634e-01 | 21721.3s
+step  1275 | loss 1.2808e+00 | 21965.7s
+step  1275 | val_loss 2.8211e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1280 | loss 1.1869e+00 | 22138.4s
+step  1285 | loss 1.1355e+00 | 22308.9s
+step  1290 | loss 6.7333e-01 | 22482.9s
+step  1295 | loss 7.0693e-01 | 22685.3s
+step  1300 | loss 1.0085e+00 | 22850.5s
+step  1300 | val_loss 2.7868e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+Model saved to /work/formation/tpirtmntll/checkpoints/best_tmp
+  → new best checkpoint saved to /work/formation/tpirtmntll/checkpoints/best
+step  1305 | loss 1.4519e+00 | 23068.3s
+step  1310 | loss 5.5637e-01 | 23275.7s
+step  1315 | loss 7.8978e-01 | 23438.2s
+step  1320 | loss 9.7200e-01 | 23637.5s
+step  1325 | loss 1.4589e+00 | 23854.4s
+step  1325 | val_loss 2.8191e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1330 | loss 6.9643e-01 | 24071.1s
+step  1335 | loss 8.7003e-01 | 24238.3s
+step  1340 | loss 8.9428e-01 | 24408.9s
+step  1345 | loss 1.2223e+00 | 24567.1s
+step  1350 | loss 8.6824e-01 | 24766.5s
+step  1350 | val_loss 2.8038e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1355 | loss 8.3965e-01 | 24889.8s
+step  1360 | loss 4.5808e-01 | 25024.7s
+step  1365 | loss 7.6980e-01 | 25194.0s
+step  1370 | loss 1.1495e+00 | 25335.2s
+step  1375 | loss 5.3051e-01 | 25612.8s
+step  1375 | val_loss 2.8774e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1380 | loss 1.6409e+00 | 25832.9s
+step  1385 | loss 3.0094e-01 | 25984.6s
+step  1390 | loss 9.9223e-01 | 26184.8s
+step  1395 | loss 7.2685e-01 | 26421.1s
+step  1400 | loss 7.2122e-01 | 26600.7s
+step  1400 | val_loss 2.8363e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1405 | loss 1.0612e+00 | 26759.6s
+step  1410 | loss 3.6121e-01 | 27050.2s
+step  1415 | loss 4.4332e-01 | 27234.3s
+step  1420 | loss 1.3081e+00 | 27423.6s
+step  1425 | loss 8.4431e-01 | 27599.1s
+step  1425 | val_loss 2.7930e-01
+Model saved to /work/formation/tpirtmntll/checkpoints/last_tmp
+  → saved last checkpoint to /work/formation/tpirtmntll/checkpoints/last
+step  1430 | loss 7.0952e-01 | 27783.5s
+step  1435 | loss 1.3273e+00 | 27944.7s
+step  1440 | loss 1.2999e+00 | 28123.1s
+step  1445 | loss 1.1208e+00 | 28310.1s
+step  1450 | loss 5.0786e-01 | 28552.3s
