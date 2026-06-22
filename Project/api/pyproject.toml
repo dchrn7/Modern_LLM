@@ -1,0 +1,24 @@
+[project]
+name = "vlm-chatbot-api"
+version = "0.1.0"
+description = "FastAPI service serving SmolVLM-256M-Instruct"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "fastapi>=0.115,<0.116",
+  "uvicorn[standard]>=0.32,<0.33",
+  "pydantic>=2.9,<3.0",
+  "transformers>=4.47,<4.50",
+  "torch>=2.5,<2.6",
+  "torchvision>=0.20,<0.21",
+  "pillow>=11.0,<12.0",
+  "numpy>=1.26,<3.0",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

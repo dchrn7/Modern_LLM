@@ -36,6 +36,7 @@ from data.processors import get_tokenizer, get_image_processor
 from data.collator import VQACollator
 from math import ceil
 
+user = os.environ.get("USER")
 
 # ── Cosine LR schedule with linear warmup ────────────────────────────────────
 def get_lr(step: int, max_lr: float, max_steps: int) -> float:
@@ -61,27 +62,6 @@ def get_lr(step: int, max_lr: float, max_steps: int) -> float:
 # We work with the index because
 #   - Dataset is big
 #   - We can skip the steps already done in the precedent jobs
-
-# Vibe coded
-from torch.utils.data import Sampler
-
-class ResumableRandomSampler(Sampler):
-    """Same permutation every time (seeded), but can start partway through."""
-    def __init__(self, data_source, seed, start_index=0):
-        self.data_source = data_source
-        self.seed = seed
-        self.start_index = start_index
-
-    def __iter__(self):
-        g = torch.Generator()
-        g.manual_seed(self.seed)
-        full_perm = torch.randperm(len(self.data_source), generator=g).tolist()
-        return iter(full_perm[self.start_index:])
-
-    def __len__(self):
-        return len(self.data_source) - self.start_index
-
-
 
 # ── Data loading (PROVIDED) ───────────────────────────────────────────────────
 def get_dataloaders(train_cfg: TrainConfig, vlm_cfg: VLMConfig, samples_consumed: int):
