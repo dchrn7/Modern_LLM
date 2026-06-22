@@ -238,7 +238,7 @@ def get_dataloaders(train_cfg: TrainConfig, vlm_cfg: VLMConfig, samples_consumed
             train_ds, tokenizer, image_processor, vlm_cfg, samples_consumed, resume_cache
         )
 
-        if samples_consumed != 0:
+        if os.path.isfile(resume_cache):
             os.remove(resume_cache)
 
         print(f"train datasets created : {len(train_dataset.dataset)} train samples")
@@ -329,7 +329,7 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
 
     if resume_dir:
         print(f"Resuming from {resume_dir} (step {resume_state['global_step']})")
-        model = VisionLanguageModel.from_pretrained(resume_dir, train_cfg.modality_projector_type)
+        model = VisionLanguageModel.from_pretrained(resume_dir, modality_projector_type=train_cfg.modality_projector_type)
     else:
         vlm_cfg.modality_projector_type = train_cfg.modality_projector_type
         print("No checkpoint found — starting from scratch.")
@@ -377,7 +377,7 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
     global_step = resume_state["global_step"] if resume_state else 0
     best_val_loss = resume_state["best_val_loss"] if resume_state else float("inf")
     best_mmstar_acc = resume_state["best_mmstar_acc"] if resume_state else -1.0
-    samples_consumed = resume_state["samples_consumed"] if resume_state else 0
+    samples_consumed = global_step * train_cfg.batch_size * train_cfg.gradient_accumulation_steps
     # ==================================================
 
     # ── Data ──────────────────────────────────────────────────────────────────
@@ -449,7 +449,8 @@ def train(train_cfg: TrainConfig, vlm_cfg: VLMConfig):
             batch['labels'],
         )
 
-        samples_consumed += input_ids.size(0) # keep track for restarting at the good sample
+        #samples_consumed += input_ids.size(0) # keep track for restarting at the good sample
+        # Made a mistake didn't save it, I will compute it from global step
 
         """print(input_ids.shape, labels.shape)
         for i, element in enumerate(input_ids[0]):

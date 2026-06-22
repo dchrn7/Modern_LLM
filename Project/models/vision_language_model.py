@@ -278,7 +278,7 @@ class VisionLanguageModel(nn.Module):
         print(f"Model saved to {save_directory}")
 
     @classmethod
-    def from_pretrained(cls, path: str, revision: Optional[str] = None):
+    def from_pretrained(cls, path: str, revision: Optional[str] = None, modality_projector_type="baseline"):
         """Load a trained VLM checkpoint from a local directory."""
         config_path = os.path.join(path, "config.json")
         weights_path = os.path.join(path, "model.safetensors")
@@ -286,6 +286,7 @@ class VisionLanguageModel(nn.Module):
             raise ValueError(f"Expected config.json and model.safetensors in {path}")
         with open(config_path) as f:
             cfg = VLMConfig.from_dict(json.load(f))
+        cfg.modality_projector_type = modality_projector_type
         model = cls(cfg, load_backbone=False)
         load_model(model, weights_path)
         return model

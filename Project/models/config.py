@@ -161,6 +161,8 @@ class VLMConfig:
     # We give it to the from dict function to add it in the vlm config
     # When not using from dict, we put it as a field of vlm config in training.
 
+    modality_projector_type: str = "" # to be modified  by what is given by train config
+
     @classmethod
     def from_dict(cls, d: dict, modality_projector_type="baseline") -> 'VLMConfig':
         """Reconstruct from a plain dict (e.g. loaded from JSON via asdict)."""

@@ -1,0 +1,2 @@
+Token indices sequence length is longer than the specified maximum sequence length for this model (18224 > 8192). Running this sequence through the model will result in indexing errors
+slurmstepd: error: *** JOB 93239 ON turpancomp2 CANCELLED AT 2026-06-20T01:27:42 DUE TO TIME LIMIT ***

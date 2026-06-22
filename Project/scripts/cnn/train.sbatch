@@ -27,5 +27,5 @@ uv run python /users/formation/tpirtmntll/Modern_LLM/Project/train.py \
     --modality_projector_type "cnn" \
     --batch_size 8 \
     --gradient_accumulation_steps 16 \
-    --eval_interval 25 \
+    --eval_interval 30 \
     --log_interval 5

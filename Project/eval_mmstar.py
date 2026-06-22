@@ -240,6 +240,7 @@ def parse_args():
     parser.add_argument("--output_path", type=str, default="")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--max_new_tokens", type=int, default=8)
+    parser.add_argument("--modality_projector_type", type=str, default="baseline")
     return parser.parse_args()
 
 
@@ -256,7 +257,7 @@ def main():
     print(f"Device: {device}")
 
     print(f"Loading checkpoint from {args.checkpoint}")
-    model = VisionLanguageModel.from_pretrained(args.checkpoint).to(device)
+    model = VisionLanguageModel.from_pretrained(args.checkpoint, modality_projector_type=args.modality_projector_type).to(device)
     model.eval()
 
     tokenizer = get_tokenizer(model.cfg.lm.tokenizer, model.cfg.image_token)
