@@ -206,14 +206,15 @@ class VisionLanguageModel(nn.Module):
         greedy=False,
     ):
         """Autoregressively decode text conditioned on image + prompt. PROVIDED."""
-        images = self._process_images(pixel_values, input_ids.device)
         token_embd = self.decoder.token_embedding(input_ids)
-
-        image_feats = self.vision_encoder(images)
-        image_embd = self.MP(image_feats)
-        token_embd = self._replace_img_tokens_with_embd(input_ids, token_embd, image_embd)
-
+        if pixel_values is not None:
+            images = self._process_images(pixel_values, input_ids.device)
+            image_feats = self.vision_encoder(images)
+            image_embd = self.MP(image_feats)
+            # On remplace les placeholders <|image|> par les caractéristiques de l'image
+            token_embd = self._replace_img_tokens_with_embd(input_ids, token_embd, image_embd)
         current_seq_len = token_embd.size(1)
+        
         batch_size = input_ids.size(0)
 
         prefill_out, kv_cache = self.decoder(

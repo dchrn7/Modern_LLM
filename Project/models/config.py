@@ -199,7 +199,7 @@ class TrainConfig:
     # Run the validation loop every eval_interval optimizer steps;
     # computes average val loss and saves checkpoint if improved
     #eval_interval: int = 500
-    eval_interval: int = 1000
+    eval_interval: int = 50
 
     # Print training loss to stdout every log_interval optimizer steps
     #log_interval: int = 50
@@ -250,7 +250,7 @@ class TrainConfig:
     mmstar_eval_limit: int = 128
     mmstar_output_dir: str = 'eval_results'
 
-    checkpoint_dir: str = '/work/formation/tpirtmntll/checkpoints'
+    checkpoint_dir: str = '/work/formation/tpirtchrbd/checkpoints/best'
 
     # Whether to apply torch.compile() to the model for potential speedup
     compile: bool = False
